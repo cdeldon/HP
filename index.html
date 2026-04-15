@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Mappa del Malandrino</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Special+Elite&display=swap');
+
+:root {
+    --parchment: #f5e6c8;
+    --ink: #2b1b0f;
+}
+
+/* Base */
+body, html {
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
+    background: #0b0b0b;
+}
+
+/* Canvas */
+#magic-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 0;
+}
+
+/* Views */
+.view {
+    display: none;
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+    z-index: 2;
+}
+
+.view.active {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* MAP */
+.map {
+    background: url('https://i.imgur.com/8QZ7Z7T.jpg') center/cover;
+    padding: 40px;
+    width: 90%;
+    max-width: 700px;
+    border: 8px solid #1a120b;
+    text-align: center;
+    color: #1a120b;
+    box-shadow: 0 0 50px rgba(0,0,0,0.9);
+}
+
+/* Ink animation */
+.reveal {
+    opacity: 0;
+    animation: inkReveal 2s forwards;
+}
+
+@keyframes inkReveal {
+    from { opacity: 0; filter: blur(10px);}
+    to { opacity: 1; filter: blur(0);}
+}
+
+input {
+    padding: 12px;
+    width: 80%;
+    font-size: 1.1rem;
+    margin-top: 15px;
+    font-family: 'Special Elite';
+}
+
+button {
+    margin-top: 15px;
+    padding: 10px 20px;
+    background: black;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+/* Parchment */
+.parchment {
+    background: var(--parchment);
+    padding: 40px;
+    width: 90%;
+    max-width: 700px;
+    border: 6px solid var(--ink);
+    box-shadow: 0 0 40px rgba(0,0,0,0.9);
+    text-align: center;
+    font-family: 'Special Elite';
+    transform: scale(0.8);
+    opacity: 0;
+    animation: openScroll 1.2s forwards;
+}
+
+@keyframes openScroll {
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+iframe {
+    width: 100%;
+    height: 300px;
+    margin-top: 20px;
+}
+
+</style>
+</head>
+
+<body>
+
+<canvas id="magic-canvas"></canvas>
+
+<!-- AUDIO -->
+<audio id="bg-audio" loop>
+    <source src="https://assets.mixkit.co/sfx/preview/mixkit-mystery-forest-ambience-2486.mp3">
+</audio>
+
+<audio id="success-sound">
+    <source src="https://assets.mixkit.co/sfx/preview/mixkit-magic-sparkle-902.mp3">
+</audio>
+
+<audio id="error-sound">
+    <source src="https://assets.mixkit.co/sfx/preview/mixkit-dark-spell-471.mp3">
+</audio>
+
+<!-- VIEW MAP -->
+<div id="view-map" class="view active">
+    <div class="map">
+        <h2 class="reveal">🗺️ Mappa del Malandrino</h2>
+        <p class="reveal">“Giuro solennemente di non avere buone intenzioni...”</p>
+        <p class="reveal">Inserisci la parola magica:</p>
+
+        <input id="spell" placeholder="ALOHOMORA...">
+        <br>
+        <button onclick="checkSpell()">Apri</button>
+    </div>
+</div>
+
+<!-- VIEW INVITE -->
+<div id="view-invite" class="view">
+    <div class="parchment">
+        <h1>📜 Invito Magico</h1>
+
+        <p>Sei stato selezionato per una missione segreta.</p>
+
+        <p>
+            Dovrai affrontare una <strong>Escape Room a tema Harry Potter</strong>.
+        </p>
+
+        <p>Solo i più astuti riusciranno a fuggire.</p>
+
+        <hr>
+
+        <p>
+            Dopo la missione, ti attende una <strong>cena giapponese 🍣</strong>.
+        </p>
+
+        <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ"></iframe>
+
+        <p>⚡ Il destino è stato scritto.</p>
+    </div>
+</div>
+
+<!-- VIEW ERROR -->
+<div id="view-error" class="view">
+    <div class="parchment">
+        <h1>❌ Incantesimo Fallito</h1>
+
+        <p>Le antiche magie non hanno risposto.</p>
+
+        <p>Non hai pronunciato correttamente l’incantesimo.</p>
+
+        <p>La Mappa del Malandrino rimane sigillata...</p>
+
+        <button onclick="reset()">Riprova</button>
+    </div>
+</div>
+
+<script>
+
+/* AUDIO START */
+document.body.addEventListener('click', () => {
+    document.getElementById('bg-audio').volume = 0.4;
+    document.getElementById('bg-audio').play();
+}, { once: true });
+
+/* SPELL CHECK */
+function checkSpell() {
+    const val = document.getElementById('spell').value.trim().toUpperCase();
+
+    if (val === "ALOHOMORA") {
+        document.getElementById('success-sound').play();
+
+        switchView('view-invite');
+
+    } else {
+        document.getElementById('error-sound').play();
+
+        switchView('view-error');
+    }
+}
+
+function switchView(id) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+}
+
+/* RESET */
+function reset() {
+    document.getElementById('spell').value = '';
+    switchView('view-map');
+}
+
+/* ENTER */
+document.getElementById('spell').addEventListener('keypress', e => {
+    if (e.key === 'Enter') checkSpell();
+});
+
+/* PARTICLES */
+const canvas = document.getElementById("magic-canvas");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let particles = [];
+
+class Particle {
+    constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.size = Math.random() * 2 + 1;
+        this.speedY = Math.random() * 0.5 + 0.2;
+        this.alpha = Math.random();
+    }
+
+    update() {
+        this.y -= this.speedY;
+        if (this.y < 0) this.y = canvas.height;
+    }
+
+    draw() {
+        ctx.fillStyle = `rgba(255,215,0,${this.alpha})`;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI*2);
+        ctx.fill();
+    }
+}
+
+function initParticles() {
+    for (let i = 0; i < 120; i++) {
+        particles.push(new Particle());
+    }
+}
+
+function animateParticles() {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    particles.forEach(p => {
+        p.update();
+        p.draw();
+    });
+
+    requestAnimationFrame(animateParticles);
+}
+
+initParticles();
+animateParticles();
+
+</script>
+
+</body>
+</html>
