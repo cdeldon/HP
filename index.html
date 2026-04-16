@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Mappa del Malandrino</title>
+<title>Giornata magica</title>
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Special+Elite&display=swap');
@@ -37,8 +37,7 @@ body, html {
     height: 100vh;
     position: relative;
     z-index: 2;
-
-    padding: 20px; /* ✅ prevents edge touching */
+    padding: 20px;
     box-sizing: border-box;
 }
 
@@ -71,6 +70,7 @@ body, html {
         inset 0 0 20px rgba(0,0,0,0.3);
 }
 
+/* Glow */
 .map::before {
     content: "";
     position: absolute;
@@ -91,14 +91,8 @@ body, html {
 }
 
 @keyframes magicGlow {
-    from {
-        transform: scale(0.95);
-        opacity: 0.6;
-    }
-    to {
-        transform: scale(1.05);
-        opacity: 1;
-    }
+    from { transform: scale(0.95); opacity: 0.6; }
+    to   { transform: scale(1.05); opacity: 1; }
 }
 
 /* Ink animation */
@@ -129,7 +123,7 @@ button {
     cursor: pointer;
 }
 
-/* Parchment (used elsewhere) */
+/* Parchment */
 .parchment {
     background: var(--parchment);
     padding: 40px;
@@ -190,7 +184,7 @@ button {
     100% { opacity: 0; transform: scale(0.5);}
 }
 
-/* Modal */
+/* MODAL */
 .modal {
     display: none;
     position: fixed;
@@ -201,7 +195,7 @@ button {
     background: rgba(0,0,0,0.7);
     justify-content: center;
     align-items: center;
-    padding: 20px; /* ✅ prevents edge touching */
+    padding: 20px;
     box-sizing: border-box;
 }
 
@@ -223,18 +217,11 @@ button {
     font-size: 1.2rem;
 }
 
-/* Mobile polish */
+/* Mobile */
 @media (max-width: 600px) {
-    .view {
-        padding: 16px;
-    }
-
-    .map {
-        padding: 25px;
-        border-width: 4px;
-    }
+    .view { padding: 16px; }
+    .map { padding: 25px; border-width: 4px; }
 }
-
 </style>
 </head>
 
@@ -255,20 +242,95 @@ button {
     </div>
 </div>
 
-<!-- VIEW ERROR -->
+<!-- VIEW INVITE -->
+<div id="view-invite" class="view">
+    <div class="parchment">
+
+        <h1>📜 Il Tuo Invito</h1>
+        <p>Una giornata magica ti attende.</p>
+        <p>Due prove.</p><p>Un solo destino.</p>
+
+        <div class="sections">
+
+            <div class="card" onclick="openModal('modal-challenge')">
+                <h2>🧩 La Prima Sfida</h2>
+                <p>Riuscirai a fuggire prima che sia troppo tardi?</p>
+                <div class="sparkle"></div>
+            </div>
+
+            <div class="card" onclick="openModal('modal-dinner')">
+                <h2>🍣 Il Banchetto</h2>
+                <p>Una ricompensa ti attende...</p>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<!-- MODALS -->
+<div id="modal-challenge" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">✖</span>
+        <h2>🧩 La Tua Prima Sfida</h2>
+        <p>
+            Verrai messa alla prova in una misteriosa escape room a tema magico.
+            Enigmi, segreti e incantesimi ti separano dalla libertà.
+        </p>
+
+        <p><strong>📅 Data:</strong> TBD</p>
+        <p><strong>🕒 Orario:</strong> TBD</p>
+
+        <video width="560" height="315" controls>
+          <source src="video.mp4" type="video/mp4" autoplay>
+        </video>
+    </div>
+</div>
+
+<div id="modal-dinner" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">✖</span>
+        <h2>🍣 Un Banchetto Ti Attende</h2>
+
+        <p>
+            Dopo le fatiche della sfida, sarai accolto in un luogo speciale.
+        </p>
+
+        <p>
+            Luci soffuse, sapori raffinati e un’atmosfera intima accompagneranno
+            il resto della serata.
+        </p>
+
+        <p>
+            Un momento per rilassarsi, ridere e celebrare insieme.
+        </p>
+
+    </div>
+</div>
+
+<!-- ERROR -->
 <div id="view-error" class="view">
     <div class="parchment">
         <h1>❌ Incantesimo Fallito</h1>
-        <p>La Mappa del Malandrino rimane sigillata...</p>
+        <p>Non me l'aspettavo da un'esperta del mondo magico...</p>
         <button onclick="reset()">Riprova</button>
     </div>
 </div>
 
 <script>
+function openModal(id) {
+    document.getElementById(id).style.display = 'flex';
+}
+
+function closeModal() {
+    document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+}
+
 function checkSpell() {
     const val = document.getElementById('spell').value.trim().toUpperCase();
+
     if (val === "ALOHOMORA") {
-        alert("✨ Aperto! (qui puoi collegare la tua seconda view)");
+        switchView('view-invite');
     } else {
         switchView('view-error');
     }
